@@ -8,6 +8,8 @@ import xml.etree.cElementTree as et
 import os
 
 jobs = {}
+aggregated_results = {}
+
 for file in os.listdir('.'):
     if file.endswith(".xml"):
         print file
@@ -29,6 +31,22 @@ for file in os.listdir('.'):
         jobs[file] = test_results
 
 print jobs
+
+for job_name in jobs:
+    for test_name in jobs[job_name]:
+        test = jobs[job_name][test_name]
+        if not test_name in aggregated_results:
+            test['good_jobs'] = []
+            test['bad_jobs'] = []
+            aggregated_results[test_name] = test
+        if test['result'] == 'passed':
+            aggregated_results[test_name]['good_jobs'].append(job_name)
+        else:
+            aggregated_results[test_name]['bad_jobs'].append(
+                {'job': job_name, 'result': test['result'], 'detail': test['detail']}
+            )
+
+print aggregated_results
 
 #
 # sxml = """
