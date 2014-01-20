@@ -14,7 +14,8 @@ aggregated_results = {}
 for root, sub_folders, files in os.walk('xml_results'):
     print 'root: %s, sub_folders: %s, files: %s' % (root, sub_folders, files)
     if 'results.xml' in files:
-        print 'results.xml found!'
+        job_name = root.split("/")[1]
+        print 'results.xml found in %s!' % job_name
         with open(os.path.join(root, 'results.xml'), 'r') as xml_file:
 
             tree = et.fromstring(xml_file.read())
@@ -30,7 +31,7 @@ for root, sub_folders, files in os.walk('xml_results'):
 
                 test_results[el.attrib['name']] = test
 
-            jobs[file] = test_results
+            jobs[job_name] = test_results
 
 # print jobs
 
