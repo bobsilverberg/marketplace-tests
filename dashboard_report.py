@@ -39,15 +39,16 @@ for job_name in jobs:
     for test_name in jobs[job_name]:
         test = jobs[job_name][test_name]
         if not test_name in aggregated_results:
-            test['good_jobs'] = []
-            test['bad_jobs'] = []
-            aggregated_results[test_name] = test
+            aggregated_results[test_name] = {'good_jobs': [], 'bad_jobs': []}
         if test['result'] == 'passed':
             aggregated_results[test_name]['good_jobs'].append(job_name)
         else:
             aggregated_results[test_name]['bad_jobs'].append(
                 {'job': job_name, 'result': test['result'], 'detail': test['detail']}
             )
+
+for test in aggregated_results:
+    aggregated_results[test]['passed'] = not bool(len(aggregated_results[test]['bad_jobs']))
 
 # print aggregated_results
 with open('final.json', 'w') as outfile:
