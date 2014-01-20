@@ -11,27 +11,28 @@ import xml.etree.cElementTree as et
 jobs = {}
 aggregated_results = {}
 
-for file in os.listdir('.'):
-    if file.endswith(".xml"):
-        print file
-        xml_file = open(file, 'r')
+for root, sub_folders, files in os.walk('xml_results'):
+    print 'root: %s, sub_folders: %s, files: %s' % (root, sub_folders, files)
+    if 'results.xml' in files:
+        print 'results.xml found!'
+        with open(os.path.join(root, 'results.xml'), 'r') as xml_file:
 
-        tree = et.fromstring(xml_file.read())
-        test_results = {}
-        for el in tree.findall('testcase'):
-            test = {}
-            if len(el.getchildren()) == 0:
-                test['result'] = 'passed'
-            else:
-                result = el.getchildren()[0]
-                test['result'] = result.tag
-                test['detail'] = '%s: %s' % (result.attrib['message'], result.text)
+            tree = et.fromstring(xml_file.read())
+            test_results = {}
+            for el in tree.findall('testcase'):
+                test = {}
+                if len(el.getchildren()) == 0:
+                    test['result'] = 'passed'
+                else:
+                    result = el.getchildren()[0]
+                    test['result'] = result.tag
+                    test['detail'] = '%s: %s' % (result.attrib['message'], result.text)
 
-            test_results[el.attrib['name']] = test
+                test_results[el.attrib['name']] = test
 
-        jobs[file] = test_results
+            jobs[file] = test_results
 
-print jobs
+# print jobs
 
 for job_name in jobs:
     for test_name in jobs[job_name]:
@@ -47,7 +48,7 @@ for job_name in jobs:
                 {'job': job_name, 'result': test['result'], 'detail': test['detail']}
             )
 
-print aggregated_results
+# print aggregated_results
 with open('final.json', 'w') as outfile:
     json.dump(aggregated_results, outfile)
 
