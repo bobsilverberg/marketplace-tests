@@ -4,8 +4,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import xml.etree.cElementTree as et
+import json
 import os
+import xml.etree.cElementTree as et
 
 jobs = {}
 aggregated_results = {}
@@ -47,6 +48,8 @@ for job_name in jobs:
             )
 
 print aggregated_results
+with open('final.json', 'w') as outfile:
+    json.dump(aggregated_results, outfile)
 
 #
 # sxml = """
