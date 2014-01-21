@@ -10,6 +10,7 @@ import xml.etree.cElementTree as et
 
 jobs = {}
 aggregated_results = {}
+final = []
 
 for root, sub_folders, files in os.walk('xml_results'):
     print 'root: %s, sub_folders: %s, files: %s' % (root, sub_folders, files)
@@ -39,7 +40,7 @@ for job_name in jobs:
     for test_name in jobs[job_name]:
         test = jobs[job_name][test_name]
         if not test_name in aggregated_results:
-            aggregated_results[test_name] = {'good_jobs': [], 'bad_jobs': []}
+            aggregated_results[test_name] = {'test_name': test_name, 'good_jobs': [], 'bad_jobs': []}
         if test['result'] == 'passed':
             aggregated_results[test_name]['good_jobs'].append(job_name)
         else:
@@ -49,10 +50,11 @@ for job_name in jobs:
 
 for test in aggregated_results:
     aggregated_results[test]['passed'] = not bool(len(aggregated_results[test]['bad_jobs']))
+    final.append(aggregated_results[test])
 
 # print aggregated_results
 with open('final.json', 'w') as outfile:
-    json.dump(aggregated_results, outfile)
+    json.dump(final, outfile)
 
 #
 # sxml = """
