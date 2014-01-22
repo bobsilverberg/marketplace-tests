@@ -10,7 +10,7 @@ import xml.etree.cElementTree as et
 
 jobs = {}
 aggregated_results = {'Firefox OS': {}, 'Android': {}, 'Desktop': {}}
-# final = {'Firefox OS': {}, 'Android': {}, 'Desktop': {}}
+final = []
 XML_FILE_ROOT_FOLDER = 'xml_results'
 
 for file in os.listdir(XML_FILE_ROOT_FOLDER):
@@ -23,7 +23,7 @@ for file in os.listdir(XML_FILE_ROOT_FOLDER):
             tree = et.fromstring(xml_file.read())
             test_results = {}
             for el in tree.findall('testcase'):
-                test = {}
+                test = {'classname': el.attrib['classname']}
                 if len(el.getchildren()) == 0:
                     test['result'] = 'passed'
                 else:
@@ -47,24 +47,30 @@ for job_name in jobs:
     target_group = aggregated_results[group]
     for test_name in jobs[job_name]:
         test = jobs[job_name][test_name]
-        if not test_name in aggregated_results:
-            target_group[test_name] = {'test_name': test_name, 'good_jobs': [], 'bad_jobs': []}
+        if not test_name in target_group:
+            target_group[test_name] = {'test_name': test_name, 'classname': test['classname'], 'passed': [], 'skipped': {}, 'failed': []}
         if test['result'] == 'passed':
-            target_group[test_name]['good_jobs'].append(job_name)
+            target_group[test_name]['passed'].append(job_name)
+        elif test['result'] == 'skipped':
+            if 'jobs' in target_group[test_name]['skipped']:
+                target_group[test_name]['skipped']['jobs'].append(job_name)
+            else:
+                target_group[test_name]['skipped'] = {'result': test['result'], 'detail': test['detail'], 'jobs': [job_name]}
         else:
-            target_group[test_name]['bad_jobs'].append(
-                {'job': job_name, 'result': test['result'], 'detail': test['detail']}
-            )
+            target_group[test_name]['failed'].append({'result': test['result'], 'detail': test['detail'], 'jobs': [job_name]})
 
-for group in aggregated_results:
-    target_group = aggregated_results[group]
-    for test in target_group:
-        target_group[test]['passed'] = not bool(len(target_group[test]['bad_jobs']))
-    # final.append(target_group)
+for group_key in aggregated_results:
+    target_group = aggregated_results[group_key]
+    new_group = []
+    for test_key in target_group:
+        test = target_group[test_key]
+        test['all_passed'] = not bool(len(test['failed']))
+        new_group.append(test)
+    final.append({'group': group_key, 'test_results': new_group})
 
 # print aggregated_results
 with open('final.json', 'w') as outfile:
-    json.dump(aggregated_results, outfile)
+    json.dump(final, outfile)
 
 #
 # sxml = """
