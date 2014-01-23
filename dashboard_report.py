@@ -44,11 +44,22 @@ for job_name in jobs:
         group = 'Android'
     else:
         group = 'Desktop'
+    if job_name.startswith('marketplace.dev'):
+        environment = 'dev'
+    elif job_name.startswith('marketplace.stage'):
+        environment = 'stage'
+    elif job_name.startswith('marketplace.prod'):
+        environment = 'prod'
+    else:
+        environment = 'unknown'
+
     target_group = aggregated_results[group]
     for test_name in jobs[job_name]:
         test = jobs[job_name][test_name]
         if not test_name in target_group:
-            target_group[test_name] = {'test_name': test_name, 'classname': test['classname'], 'passed': [], 'skipped': {}, 'failed': []}
+            target_group[test_name] = {'test_name': test_name, 'classname': test['classname'], 'passed': [], 'skipped': {}, 'failed': [], 'environments': []}
+        if not environment in target_group[test_name]['environments']:
+            target_group[test_name]['environments'].append(environment)
         if test['result'] == 'passed':
             target_group[test_name]['passed'].append(job_name)
         elif test['result'] == 'skipped':
