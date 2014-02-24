@@ -23,6 +23,11 @@ class Base(Page):
         pop_up.sign_in(credentials['email'], credentials['password'])
         WebDriverWait(self.selenium, self.timeout).until(lambda s: self.header.is_user_logged_in)
 
+    def go_to_my_submissions(self):
+        self.selenium.get('%s/developers/submissions' % self.base_url)
+        from pages.desktop.developer_hub.developer_submissions import DeveloperSubmissions
+        return DeveloperSubmissions(self.testsetup)
+
     @property
     def page_title(self):
         WebDriverWait(self.selenium, 10).until(lambda s: self.selenium.title)
@@ -66,7 +71,4 @@ class Base(Page):
             self._hover_user_menu()
             element.click()
             from pages.desktop.developer_hub.developer_submissions import DeveloperSubmissions
-            dev_submissions = DeveloperSubmissions(self.testsetup)
-            WebDriverWait(self.selenium, self.timeout).until(lambda s: self.selenium.execute_script('return jQuery.active == 0')
-                                                             and dev_submissions.is_the_current_page)
-            return dev_submissions
+            return DeveloperSubmissions(self.testsetup)

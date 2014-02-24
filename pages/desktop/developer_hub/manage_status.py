@@ -22,6 +22,7 @@ class ManageStatus(Base):
     _delete_app_locator = (By.ID, 'delete-addon')
     _delete_popup_locator = (By.ID, 'modal-delete')
     _app_not_found_message_locator = (By.CSS_SELECTOR, '#page section.primary h1')
+    _edit_listing_link_locator = (By.LINK_TEXT, 'Edit Listing')
 
     @property
     def app_not_found_message(self):
