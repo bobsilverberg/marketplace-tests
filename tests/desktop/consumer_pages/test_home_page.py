@@ -125,12 +125,12 @@ class TestConsumerPage(BaseTest):
     @pytest.mark.sanity
     @pytest.mark.credentials
     @pytest.mark.nondestructive
-    def test_footer_has_expected_items(self, mozwebqa, existing_user):
+    def test_footer_has_expected_items(self, mozwebqa, new_user):
         home_page = Home(mozwebqa)
         home_page.go_to_homepage()
 
         home_page.header.click_sign_in()
-        home_page.login(existing_user['email'], existing_user['password'])
+        home_page.login(new_user['email'], new_user['password'])
 
         # Inspect footer elements
         for link in home_page.footer.footer_links_list:
